@@ -1,0 +1,29 @@
+{
+    "name": "xtompie/dao",
+    "type": "library",
+    "description": "DAO - Data Access Object - wrapper over SQL",
+    "keywords": ["data", "sql", "database"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tomasz Pielczyk",
+            "email": "tomasz.pielczyk@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Xtompie\\Dao\\": "src"
+        }
+    },
+    "require": {
+        "php": ">=8.0",
+        "doctrine/dbal": "^3.4",
+        "xtompie/aql": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "scripts": {
+        "test": "php ./vendor/bin/phpunit tests"
+    }
+}

@@ -41,7 +41,7 @@ class Dao
 
     public function count(array $query): int
     {
-        return (int)$this->val(array_merge($query, ['select' => 'COUNT(*)']));
+        return (int)$this->val(array_merge(['select' => 'COUNT(*)'], $query));
     }
 
     public function records(string $table, ?array $where, ?string $order = null, ?int $offset = null, ?int $limit = null): array
@@ -105,9 +105,9 @@ class Dao
         return $this->adapter->transaction($callback);
     }
 
-    public function quote(mixed $value, ?string $type = null): mixed
+    public function quote(mixed $value): mixed
     {
-        return $this->adapter->quote($value, $type);
+        return $this->adapter->quote($value);
     }
 
     protected function aql(array $aql): array

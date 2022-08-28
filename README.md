@@ -118,12 +118,12 @@ class Dao extends BaseDao
     {
         if (isset($aql['paging'])) {
             $paging = $aql['paging'];
+            unset($aql['paging']);
             if (!$paging instanceof Paging) {
                 throw new \Exception();
             }
             $aql['offset'] => $paging->offset();
             $aql['limit'] => $paging->limit();
-            unset($aql['paging']);
         }
         return parent::aql($aql);
     }

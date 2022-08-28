@@ -75,9 +75,9 @@ class Dao
 ```php
 class Dao
 {
-    public function command(array $command): int
+    public function command(array $command): int {}
 
-    public function insert(string $table, array $set): int
+    public function insert(string $table, array $set): int {}
 
     public function update(string $table, array $set, array $where): int {}
 

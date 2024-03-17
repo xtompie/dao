@@ -3,15 +3,25 @@
 DAO - Data Access Object - wrapper over SQL
 
 ```php
-/** @var Dao $dao */
+/** @var Xtompie\Dao\Dao $dao */
 $dao->insert('user', ['email' => 'john.doe@exmaple.com', 'created_at' => time()]);
 $records = $dao->query(['select' => '*', 'from' => 'user', 'limit' => 10]);
 ```
 
+- [DAO](#dao)
+  - [Requiments](#requiments)
+  - [Installation](#installation)
+  - [Docs](#docs)
+    - [Createing Dao instance](#createing-dao-instance)
+    - [Read](#read)
+    - [Read from one table](#read-from-one-table)
+    - [Write](#write)
+    - [Transaction](#transaction)
+    - [Extends AQL](#extends-aql)
+
 ## Requiments
 
 PHP >= 8.0
-
 
 ## Installation
 
@@ -23,11 +33,27 @@ composer require xtompie/dao
 
 ## Docs
 
+### Createing Dao instance
+
+```php
+use PDO;
+use Xtompie\Aql\Aql;
+use Xtompie\Aql\PostgreSQLPlatform;
+use Xtompie\Dao\Dao;
+
+$dao = new Dao(
+    adapter: new PdoAdapter(pdo: new PDO('pgsql:host=localhost;dbname=test', 'postgres')),
+    aql: new Aql(platform: new PostgreSQLPlatform()),
+);
+```
+
+Available bulid-in adapters `Xtompie\Dao\Adapter`:
+
+- `Xtompie\Dao\DoctrineAdapter`
+- `Xtompie\Dao\PdoAdapter`
+
 Uses [AQL](https://github.com/xtompie/aql) format to build sql queries.
 
-Queries are executed throught `Doctrine\DBAL\Connection`.
-It can be change by creating adapter like `Xtompie\Dao\Adapter` and pass it to Dao
-constructor.
 
 ### Read
 
@@ -48,6 +74,9 @@ class Dao
 
     public function count(array $query): int {}
     // returns number of selected rows, by default uses `COUNT(*)`
+
+    public function stream(array $query): Generator {}
+    // yield records
 }
 ```
 
@@ -67,6 +96,10 @@ class Dao
 
     public function exists(string $table, array $where): bool {}
     // similiar to `any`
+
+    public function streamRecords(string $table, ?array $where = null, ?string $order = null, ?int $offset = null, ?int $limit = null): Generator
+    // yield records
+
 }
 ```
 
@@ -77,9 +110,13 @@ class Dao
 {
     public function command(array $command): int {}
 
-    public function insert(string $table, array $set): int {}
+    public function insert(string $table, array $values): int {}
+
+    public function insertBulk(string $table, array $bluk): int {}
 
     public function update(string $table, array $set, array $where): int {}
+
+    public function upsert(string $table, array $set, array $where): int {}
 
     public function delete(string $table, array $where): int {}
 }

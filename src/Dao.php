@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Xtompie\Dao;
 
 use Exception;
+use Generator;
 use Xtompie\Aql\Aql;
 
 class Dao
@@ -24,6 +25,27 @@ class Dao
         return $this->adapter->command(...$this->sql($command));
     }
 
+    public function stream(array $query): Generator
+    {
+        yield from $this->adapter->stream(...$this->sql($query));
+    }
+
+    public function streamRecords(string $table, ?array $where = null, ?string $order = null, ?int $offset = null, ?int $limit = null): Generator
+    {
+        foreach (
+            $this->stream(array_filter([
+                'select' => '*',
+                'from' => $table,
+                'where' => $where,
+                'order' => $order,
+                'offset' => $offset,
+                'limit' => $limit,
+            ])) as $tuple
+        ) {
+            yield $tuple;
+        }
+    }
+
     public function first(array $query): ?array
     {
         return array_values($this->query($query))[0] ?? null;
@@ -39,9 +61,10 @@ class Dao
         return (bool)$this->first($query);
     }
 
-    public function count(array $query): int
+    public function count(array $query, ?string $count = null): int
     {
-        return (int)$this->val(array_merge(['select' => 'COUNT(*)'], $query));
+        $count = $count ?: '*';
+        return (int) $this->val(array_merge($query, ['select' => "COUNT($count)"]));
     }
 
     public function records(string $table, ?array $where, ?string $order = null, ?int $offset = null, ?int $limit = null): array
@@ -63,7 +86,7 @@ class Dao
 
     public function amount(string $table, ?array $where = null, ?string $group = null): int
     {
-        return $this->count(array_filter(['table' => $table, 'where' => $where, 'group' => $group]));
+        return $this->count(array_filter(['from' => $table, 'where' => $where, 'group' => $group]));
     }
 
     public function exists(string $table, array $where): bool
@@ -71,11 +94,19 @@ class Dao
         return $this->any(['select' => '*', 'from' => $table, 'where' => $where]);
     }
 
-    public function insert(string $table, array $set): int
+    public function insert(string $table, array $values): int
     {
         return $this->command([
             'insert' => $table,
-            'set' => $set,
+            'values' => $values,
+        ]);
+    }
+
+    public function insertBulk(string $table, array $bluk): int
+    {
+        return $this->command([
+            'insert' => $table,
+            'values_bulk' => $bluk,
         ]);
     }
 
@@ -86,6 +117,14 @@ class Dao
             'set' => $set,
             'where' => $where,
         ]);
+    }
+
+    public function upsert(string $table, array $set, array $where): int
+    {
+        return $this->exists(table: $table, where: $where)
+            ? $this->update(table: $table, set: $set, where: $where)
+            : $this->insert(table: $table, values: [...$where, ...$set])
+        ;
     }
 
     public function delete(string $table, array $where): int

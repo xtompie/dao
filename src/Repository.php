@@ -15,6 +15,7 @@ class Repository
         protected ?string $collectionClass = null,
         protected ?string $itemClass = null,
         protected mixed $itemFactory = null,
+        protected array $static = [],
     ) {
     }
 
@@ -46,12 +47,19 @@ class Repository
         return $new;
     }
 
+    public function withStatic(array $static): static
+    {
+        $new = clone $this;
+        $new->static = $static;
+        return $new;
+    }
+
     public function find(?array $where = null, ?string $order = null, ?int $offset = null): mixed
     {
         return $this->item(
             tuple: $this->dao->record(
                 table: $this->table(),
-                where: $where,
+                where: $this->where($where),
                 order: $order,
                 offset: $offset,
             ),
@@ -63,7 +71,7 @@ class Repository
         return $this->items(
             tuples: $this->dao->records(
                 table: $this->table(),
-                where: $where,
+                where: $this->where($where),
                 order: $order,
                 limit: $limit,
                 offset: $offset
@@ -74,7 +82,13 @@ class Repository
     public function stream(?array $where = null, ?string $order = null, ?int $limit = null, ?int $offset = null): Generator
     {
         foreach (
-            $this->dao->streamRecords(table: $this->table(), where: $where, order: $order, limit: $limit, offset: $offset)
+            $this->dao->streamRecords(
+                table: $this->table(),
+                where: $this->where($where),
+                order: $order,
+                limit: $limit,
+                offset: $offset
+            )
             as $tuple
         ) {
             yield $this->item($tuple);
@@ -83,17 +97,24 @@ class Repository
 
     public function count(?array $where = null, ?string $group = null, ?string $count = null): int
     {
-        return $this->dao->count(array_filter(['from' => $this->table(), 'where' => $where, 'group' => $group]), $count);
+        return $this->dao->count(
+            array_filter([
+                'from' => $this->table(),
+                'where' => $this->where($where),
+                'group' => $group
+            ]),
+            $count
+        );
     }
 
     public function exists(?array $where = null): bool
     {
-        return $this->dao->exists(table: $this->table(), where: $where);
+        return $this->dao->exists(table: $this->table(), where: $this->where($where));
     }
 
     public function insert(array $values): void
     {
-        $this->dao->insert(table: $this->table(), values: $values);
+        $this->dao->insert(table: $this->table(), values: $this->value($values));
     }
 
     public function update(array $set, array $where, bool $patch = false): void
@@ -104,17 +125,17 @@ class Repository
                 return;
             }
         }
-        $this->dao->update(table: $this->table(), set: $set, where: $where);
+        $this->dao->update(table: $this->table(), set: $this->value($set), where: $this->where($where));
     }
 
     public function upsert(array $set, array $where): void
     {
-        $this->dao->upsert(table: $this->table(), set: $set, where: $where);
+        $this->dao->upsert(table: $this->table(), set: $this->value($set), where: $this->where($where));
     }
 
     public function delete(array $where): void
     {
-        $this->dao->delete(table: $this->table(), where: $where);
+        $this->dao->delete(table: $this->table(), where: $this->where($where));
     }
 
     public function patch(array $set, array $where): void
@@ -157,5 +178,25 @@ class Repository
         }
 
         return $tuples;
+    }
+
+    protected function where(?array $where): ?array
+    {
+        $combine = [];
+        if ($where) {
+            $combine = $where;
+        }
+        if ($this->static) {
+            $combine = array_merge($combine, $this->static);
+        }
+        return $combine ?: null;
+    }
+
+    protected function value($value): array
+    {
+        if ($this->static) {
+            $value = array_merge($value, $this->static);
+        }
+        return $value;
     }
 }

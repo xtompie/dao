@@ -60,7 +60,7 @@ class DoctrineAdapter implements Adapter
 
     protected function types(array $binds): array
     {
-        return array_map(fn (string $param) => gettype($param), $binds);
+        return array_map(fn (mixed $param) => $this->type(gettype($param)), $binds);
     }
 
     protected function type(string $type): int

@@ -16,6 +16,7 @@ class Repository
         protected ?string $itemClass = null,
         protected mixed $itemFactory = null,
         protected array $static = [],
+        protected mixed $callableStatic = null,
     ) {
     }
 
@@ -51,6 +52,13 @@ class Repository
     {
         $new = clone $this;
         $new->static = $static;
+        return $new;
+    }
+
+    public function withCallableStatic(callable $static): static
+    {
+        $new = clone $this;
+        $new->callableStatic = $static;
         return $new;
     }
 
@@ -188,6 +196,9 @@ class Repository
         }
         if ($this->static) {
             $combine = array_merge($combine, $this->static);
+        }
+        if ($this->callableStatic) {
+            $combine = array_merge($combine, ($this->callableStatic)());
         }
         return $combine ?: null;
     }

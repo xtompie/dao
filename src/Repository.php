@@ -208,6 +208,9 @@ class Repository
         if ($this->static) {
             $value = array_merge($value, $this->static);
         }
+        if ($this->callableStatic) {
+            $value = array_merge($value, ($this->callableStatic)());
+        }
         return $value;
     }
 }

@@ -7,8 +7,21 @@ namespace Xtompie\Dao;
 use Generator;
 use ReflectionClass;
 
+/**
+ * @template Item
+ * @template Collection
+ */
 class Repository
 {
+    /**
+     * @param Dao $dao
+     * @param string|null $table
+     * @param class-string<Collection>|null $collectionClass
+     * @param class-string<Item>|null $itemClass
+     * @param callable(array<string, mixed>):Item|null $itemFactory
+     * @param array<string, mixed> $static
+     * @param callable():array<string, mixed>|null $callableStatic
+     */
     public function __construct(
         protected Dao $dao,
         protected ?string $table = null,
@@ -48,6 +61,9 @@ class Repository
         return $new;
     }
 
+    /*
+     * @param array<string, mixed> $static
+     */
     public function withStatic(array $static): static
     {
         $new = clone $this;
@@ -55,6 +71,9 @@ class Repository
         return $new;
     }
 
+    /*
+     * @param callable():array<string, mixed> $static
+     */
     public function withCallableStatic(callable $static): static
     {
         $new = clone $this;
@@ -62,6 +81,12 @@ class Repository
         return $new;
     }
 
+    /**
+     * @param array<string, mixed>|null $where
+     * @param string|null $order
+     * @param int|null $offset
+     * @return Item|null
+     */
     public function find(?array $where = null, ?string $order = null, ?int $offset = null): mixed
     {
         return $this->item(
@@ -74,6 +99,13 @@ class Repository
         );
     }
 
+    /**
+     * @param array<string, mixed>|null $where
+     * @param string|null $order
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return Collection
+     */
     public function findAll(?array $where = null, ?string $order = null, ?int $limit = null, ?int $offset = null): mixed
     {
         return $this->items(
@@ -87,6 +119,13 @@ class Repository
         );
     }
 
+    /**
+     * @param array<string, mixed>|null $where
+     * @param string|null $order
+     * @param int|null $limit
+     * @param int|null $offset
+     * @return Generator<Item>
+     */
     public function stream(?array $where = null, ?string $order = null, ?int $limit = null, ?int $offset = null): Generator
     {
         foreach (
@@ -103,6 +142,11 @@ class Repository
         }
     }
 
+    /**
+     * @param array<string, mixed>|null $where
+     * @param string|null $group
+     * @param string|null $count
+     */
     public function count(?array $where = null, ?string $group = null, ?string $count = null): int
     {
         return $this->dao->count(
@@ -115,16 +159,25 @@ class Repository
         );
     }
 
+    /**
+     * @param array<string, mixed>|null $where
+     */
     public function exists(?array $where = null): bool
     {
         return $this->dao->exists(table: $this->table(), where: $this->where($where));
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     public function insert(array $values): void
     {
         $this->dao->insert(table: $this->table(), values: $this->value($values));
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     public function update(array $set, array $where, bool $patch = false): void
     {
         if ($patch) {
@@ -136,21 +189,34 @@ class Repository
         $this->dao->update(table: $this->table(), set: $this->value($set), where: $this->where($where));
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     public function upsert(array $set, array $where): void
     {
         $this->dao->upsert(table: $this->table(), set: $this->value($set), where: $this->where($where));
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     public function delete(array $where): void
     {
         $this->dao->delete(table: $this->table(), where: $this->where($where));
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     public function patch(array $set, array $where): void
     {
         $this->update(set: $set, where: $where, patch: true);
     }
 
+    /**
+     * @param mixed $id
+     * @param array<string, mixed> $values
+     */
     public function patchId(mixed $id, array $set): void
     {
         $this->patch(set: $set, where: ['id' => $id]);
@@ -164,6 +230,10 @@ class Repository
         return $this->table;
     }
 
+    /**
+     * @param array<string, mixed>|null $tuple
+     * @return Item|null
+     */
     protected function item(?array $tuple): mixed
     {
         if (!$tuple) {
@@ -177,6 +247,10 @@ class Repository
         }
     }
 
+    /**
+     * @param array<array<string, mixed>> $tuples
+     * @return Collection
+     */
     protected function items(array $tuples): mixed
     {
         $tuples = array_map(fn (array $tuple) => $this->item($tuple), $tuples);
@@ -188,6 +262,9 @@ class Repository
         return $tuples;
     }
 
+    /**
+     * @param array<string, mixed>|null $where
+     */
     protected function where(?array $where): ?array
     {
         $combine = [];
@@ -203,6 +280,9 @@ class Repository
         return $combine ?: null;
     }
 
+    /**
+     * @param array<string, mixed> $value
+     */
     protected function value($value): array
     {
         if ($this->static) {

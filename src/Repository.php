@@ -225,7 +225,7 @@ class Repository
     /**
      * @param array<string> $allowed
      */
-    function order(?string $value, array $allowed, ?string $default): ?string
+    public function order(?string $value, array $allowed, ?string $default): ?string
     {
         if ($value !== null) {
             $parts = explode(':', $value);

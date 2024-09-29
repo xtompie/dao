@@ -222,6 +222,36 @@ class Repository
         $this->patch(set: $set, where: ['id' => $id]);
     }
 
+    /**
+     * @param array<string> $allowed
+     */
+    function order(?string $value, array $allowed, ?string $default): ?string
+    {
+        if ($value !== null) {
+            $parts = explode(':', $value);
+            if (count($parts) === 2) {
+                list($field, $direction) = $parts;
+                $direction = strtolower($direction);
+                if (in_array($field, $allowed, true) && in_array($direction, ['asc', 'desc'], true)) {
+                    return $field . ' ' . $direction;
+                }
+            }
+        }
+
+        if ($default !== null) {
+            $parts = explode(':', $default);
+            if (count($parts) === 2) {
+                list($field, $direction) = $parts;
+                $direction = strtolower($direction);
+                if (in_array($direction, ['asc', 'desc'], true)) {
+                    return $field . ' ' . $direction;
+                }
+            }
+        }
+
+        return null;
+    }
+
     protected function table(): string
     {
         if (!$this->table) {

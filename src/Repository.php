@@ -18,9 +18,9 @@ class Repository
      * @param string|null $table
      * @param class-string<Collection>|null $collectionClass
      * @param class-string<Item>|null $itemClass
-     * @param callable(array<string, mixed>):Item|null $itemFactory
-     * @param array<string, mixed> $static
-     * @param callable():array<string, mixed>|null $callableStatic
+     * @param callable(array<string,mixed>):Item|null $itemFactory
+     * @param array<string,mixed> $static
+     * @param callable():array<string,mixed>|null $callableStatic
      */
     public function __construct(
         protected Dao $dao,
@@ -61,8 +61,8 @@ class Repository
         return $new;
     }
 
-    /*
-     * @param array<string, mixed> $static
+    /**
+     * @param array<string,mixed> $static
      */
     public function withStatic(array $static): static
     {
@@ -71,8 +71,8 @@ class Repository
         return $new;
     }
 
-    /*
-     * @param callable():array<string, mixed> $static
+    /**
+     * @param callable():array<string,mixed> $static
      */
     public function withCallableStatic(callable $static): static
     {
@@ -82,7 +82,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed>|null $where
+     * @param array<string,mixed>|null $where
      * @param string|null $order
      * @param int|null $offset
      * @return Item|null
@@ -100,7 +100,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed>|null $where
+     * @param array<string,mixed>|null $where
      * @param string|null $order
      * @param int|null $limit
      * @param int|null $offset
@@ -120,7 +120,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed>|null $where
+     * @param array<string,mixed>|null $where
      * @param string|null $order
      * @param int|null $limit
      * @param int|null $offset
@@ -143,7 +143,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed>|null $where
+     * @param array<string,mixed>|null $where
      * @param string|null $group
      * @param string|null $count
      */
@@ -160,7 +160,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed>|null $where
+     * @param array<string,mixed>|null $where
      */
     public function exists(?array $where = null): bool
     {
@@ -168,7 +168,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed> $values
+     * @param array<string,mixed> $values
      */
     public function insert(array $values): void
     {
@@ -176,7 +176,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed> $values
+     * @param array<string,mixed> $values
      */
     public function update(array $set, array $where, bool $patch = false): void
     {
@@ -190,7 +190,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed> $values
+     * @param array<string,mixed> $values
      */
     public function upsert(array $set, array $where): void
     {
@@ -198,7 +198,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed> $values
+     * @param array<string,mixed> $values
      */
     public function delete(array $where): void
     {
@@ -206,7 +206,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed> $values
+     * @param array<string,mixed> $values
      */
     public function patch(array $set, array $where): void
     {
@@ -215,7 +215,7 @@ class Repository
 
     /**
      * @param mixed $id
-     * @param array<string, mixed> $values
+     * @param array<string,mixed> $values
      */
     public function patchId(mixed $id, array $set): void
     {
@@ -231,7 +231,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed>|null $tuple
+     * @param array<string,mixed>|null $tuple
      * @return Item|null
      */
     protected function item(?array $tuple): mixed
@@ -248,7 +248,7 @@ class Repository
     }
 
     /**
-     * @param array<array<string, mixed>> $tuples
+     * @param array<array<string,mixed>> $tuples
      * @return Collection
      */
     protected function items(array $tuples): mixed
@@ -263,7 +263,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed>|null $where
+     * @param array<string,mixed>|null $where
      */
     protected function where(?array $where): ?array
     {
@@ -281,7 +281,7 @@ class Repository
     }
 
     /**
-     * @param array<string, mixed> $value
+     * @param array<string,mixed> $value
      */
     protected function value($value): array
     {

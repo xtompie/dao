@@ -39,18 +39,23 @@ class PdoAdapter implements Adapter
         return $stmt->rowCount();
     }
 
-    public function transaction(callable $callback): void
+    /**
+     * @template T
+     * @param callable():T $callback
+     * @return T
+     */
+    public function transaction(callable $callback): mixed
     {
         if ($this->pdo->inTransaction()) {
-            $callback();
-            return;
+            return $callback();
         }
 
         $this->pdo->beginTransaction();
 
         try {
-            $callback();
+            $result = $callback();
             $this->pdo->commit();
+            return $result;
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw $e;

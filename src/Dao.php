@@ -139,7 +139,12 @@ class Dao
         ]);
     }
 
-    public function transaction(callable $callback)
+    /**
+     * @template T
+     * @param callable():T $callback
+     * @return T
+     */
+    public function transaction(callable $callback): mixed
     {
         return $this->adapter->transaction($callback);
     }

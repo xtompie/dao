@@ -14,7 +14,12 @@ interface Adapter
 
     public function command(string $command, array $binds): int;
 
-    public function transaction(callable $callback): void;
+    /**
+     * @template T
+     * @param callable():T $callback
+     * @return T
+     */
+    public function transaction(callable $callback): mixed;
 
     public function quote(mixed $value): string;
 }

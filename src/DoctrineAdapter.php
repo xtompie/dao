@@ -31,11 +31,15 @@ class DoctrineAdapter implements Adapter
         return $this->connection->executeStatement($command, $binds, $this->types($binds));
     }
 
-    public function transaction(callable $callback): void
+    /**
+     * @template T
+     * @param callable():T $callback
+     * @return T
+     */
+    public function transaction(callable $callback): mixed
     {
         if ($this->connection->isTransactionActive()) {
-            $callback();
-            return;
+            return $callback();
         }
 
         if (!$this->connection->beginTransaction()) {
@@ -43,12 +47,11 @@ class DoctrineAdapter implements Adapter
         }
 
         try {
-            $callback();
+            $result = $callback();
             $this->connection->commit();
+            return $result;
         } catch (Exception $e) {
-            if ($this->connection->isTransactionActive()) {
-                $this->connection->rollBack();
-            }
+            $this->connection->rollBack();
             throw $e;
         }
     }

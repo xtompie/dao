@@ -178,15 +178,15 @@ class Repository
     /**
      * @param array<string,mixed> $values
      */
-    public function update(array $set, array $where, bool $patch = false): void
+    public function update(array $set, array $where, bool $patch = false): int
     {
         if ($patch) {
             $set = array_filter($set, fn ($v) => $v !== null);
             if (!$set) {
-                return;
+                return 0;
             }
         }
-        $this->dao->update(table: $this->table(), set: $this->value($set), where: $this->where($where));
+        return $this->dao->update(table: $this->table(), set: $this->value($set), where: $this->where($where));
     }
 
     /**
@@ -208,18 +208,18 @@ class Repository
     /**
      * @param array<string,mixed> $values
      */
-    public function patch(array $set, array $where): void
+    public function patch(array $set, array $where): int
     {
-        $this->update(set: $set, where: $where, patch: true);
+        return $this->update(set: $set, where: $where, patch: true);
     }
 
     /**
      * @param mixed $id
      * @param array<string,mixed> $values
      */
-    public function patchId(mixed $id, array $set): void
+    public function patchId(mixed $id, array $set): int
     {
-        $this->patch(set: $set, where: ['id' => $id]);
+        return $this->patch(set: $set, where: ['id' => $id]);
     }
 
     protected function table(): string

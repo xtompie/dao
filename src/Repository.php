@@ -82,7 +82,7 @@ class Repository
     }
 
     /**
-     * @param array<string,mixed>|null $where
+     * @param array<mixed>|null $where
      * @param string|null $order
      * @param int|null $offset
      * @return Item|null
@@ -100,7 +100,7 @@ class Repository
     }
 
     /**
-     * @param array<string,mixed>|null $where
+     * @param array<mixed>|null $where
      * @param string|null $order
      * @param int|null $limit
      * @param int|null $offset
@@ -120,7 +120,7 @@ class Repository
     }
 
     /**
-     * @param array<string,mixed>|null $where
+     * @param array<mixed>|null $where
      * @param string|null $order
      * @param int|null $limit
      * @param int|null $offset
@@ -143,7 +143,7 @@ class Repository
     }
 
     /**
-     * @param array<string,mixed>|null $where
+     * @param array<mixed>|null $where
      * @param string|null $group
      * @param string|null $count
      */
@@ -160,7 +160,7 @@ class Repository
     }
 
     /**
-     * @param array<string,mixed>|null $where
+     * @param array<mixed>|null $where
      */
     public function exists(?array $where = null): bool
     {

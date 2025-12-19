@@ -84,6 +84,7 @@ class PdoAdapter implements Adapter
             'NULL' => PDO::PARAM_NULL,
             'boolean' => PDO::PARAM_BOOL,
             'integer' => PDO::PARAM_INT,
+            'double' => PDO::PARAM_STR,
             'string' => PDO::PARAM_STR,
             default => throw new Exception('Unexpected type ' . $type),
         };
